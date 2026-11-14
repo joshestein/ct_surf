@@ -48,7 +48,7 @@ const noon = (date: string) => new Date(localIso(date, 12 * 60));
 /** Column heading: "08:00", or "AM" / "PM" for coarse Slots */
 const slotLabel = (s: Slot) => (s.coarse ? (clock(s.time) < "12:00" ? "AM" : "PM") : clock(s.time));
 
-const ICON_CAM = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H3z"/><path d="m17 10 4-2.5v9L17 14"/></svg>`;
+const ICON_CAM = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H3z"/><path d="m17 10 4-2.5v9L17 14"/></svg>`;
 
 const legend = `
   <div class="legend">
@@ -174,7 +174,10 @@ function renderDay(day: ForecastDay, spots: Spot[], snapshots: (Snapshot | null)
 }
 
 function renderRow(spot: Spot, dayLabel: string, columns: Slot[], slots: Slot[] | null, missing: string): string {
-  const name = `<span class="spot-name"><a href="${forecastUrl(spot)}" target="_blank" rel="noopener">${escape(spot.name)}</a><span class="old">Old data</span></span>`;
+  const webcam = spot.webcam
+    ? `<a class="webcam" href="${escape(spot.webcam)}" target="_blank" rel="noopener" aria-label="${escape(spot.name)} webcam">${ICON_CAM}Webcam</a>`
+    : "";
+  const name = `<span class="spot-name"><a class="spot-link" href="${forecastUrl(spot)}" target="_blank" rel="noopener">${escape(spot.name)}</a>${webcam}<span class="old">Old data</span></span>`;
   if (!slots) {
     return `
         <div class="spot-row" data-spot="${spot.id}">
@@ -203,15 +206,10 @@ function renderRow(spot: Spot, dayLabel: string, columns: Slot[], slots: Slot[] 
     )
     .join("");
 
-  const webcam = spot.webcam
-    ? `<div class="details-actions"><a class="webcam" href="${escape(spot.webcam)}" target="_blank" rel="noopener">${ICON_CAM}<span class="narrow-only">Webcam</span><span class="wide-only">${escape(spot.name)} webcam</span></a></div>`
-    : "";
-
   return `
         <div class="spot-row" data-spot="${spot.id}">
           <div class="grid-row">${name}${cells}</div>
           <div class="details" data-spot="${spot.id}" hidden>
-            ${webcam}
             <div role="table" class="slots" aria-label="${escape(spot.name)}, ${dayLabel}">
               <div role="row" class="slot slot-head"><span role="columnheader">Time</span><span role="columnheader">Rate</span><span role="columnheader">Swell</span><span role="columnheader">Wind</span></div>${slotRows}
             </div>

@@ -279,17 +279,36 @@ h1 {
   line-height: 1.15;
   min-width: 0;
 }
-.spot-name a {
+.spot-link {
   color: var(--ink);
   text-decoration: none;
   font-size: 13px;
   font-weight: 600;
 }
 @media (hover: hover) {
-  .spot-name a:hover {
+  .spot-link:hover,
+  .webcam:hover {
     text-decoration: underline;
     text-underline-offset: 0.2em;
   }
+}
+/* Small text link, but the row height gives it a usable tap target */
+.webcam {
+  align-self: flex-start;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  text-underline-offset: 0.2em;
+}
+.webcam:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-radius: 3px;
 }
 .old {
   display: none;
@@ -415,31 +434,6 @@ h1 {
   gap: 10px;
   padding: 6px 2px 2px;
 }
-.details-actions {
-  display: flex;
-  gap: 8px;
-  border-bottom: 1px solid var(--rule);
-  padding-bottom: 10px;
-}
-.webcam {
-  flex: 1;
-  height: 44px;
-  border-radius: 10px;
-  border: 1px solid var(--accent);
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  color: var(--accent);
-  font-size: 14px;
-  font-weight: 700;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-.webcam:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
-}
 .slots {
   display: flex;
   flex-direction: column;
@@ -535,9 +529,6 @@ h1 {
 .panel {
   display: none;
 }
-.wide-only {
-  display: none;
-}
 
 @media (min-width: 900px) {
   :root {
@@ -625,11 +616,5 @@ h1 {
   .slot {
     grid-template-columns: 50px 34px 92px minmax(0, 1fr);
     gap: 8px;
-  }
-  .wide-only {
-    display: inline;
-  }
-  .narrow-only {
-    display: none;
   }
 }
