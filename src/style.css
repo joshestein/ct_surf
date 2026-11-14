@@ -1,29 +1,28 @@
 :root {
-  --ground: #0b1720;
-  --panel: #12222d;
-  --panel-deep: #0e1c25;
-  --night: #08121a;
-  --ink: #e8eff3;
-  --muted: #9fb2bd;
-  --rule: #20343f;
-  --tick: #2c4250;
-  --edge: #3a505c;
-  --picked: #1d3a4d;
-  --warn-bg: #3a2a12;
-  --warn-ink: #ffd9a0;
-  /* Rating groups: fill and text */
-  --poor: #3a505c;
-  --poor-ink: #e8eff3;
-  --fair: #2e6a99;
+  /* Text >= 4.5:1 on its background. Cell fills stand apart from the board and from each other. */
+  --ground: #0f1211;
+  --panel: #1a201d;
+  --night: #0c0f0e;
+  --ink: #ebe7dd;
+  --muted: #a3aaa5;
+  --rule: #2a312e;
+  --tick: #333b37;
+  --edge: #4a5550;
+  --picked: #27302c;
+  --warn-ink: #f0b46a;
+  --accent: #5aa9ec;
+  /* Rating groups: fill and text. The only colour scale on the page. */
+  --poor: #36403b;
+  --poor-ink: #d6dbd7;
+  --fair: #257f59;
   --fair-ink: #ffffff;
-  --good: #5aa9ec;
-  --good-ink: #0b1720;
-  --great: #ffb547;
+  --good: #6fdca8;
+  --good-ink: #0f1211;
+  --great: #f2c14e;
   --great-ink: #1a1206;
-  /* Wind State groups */
-  --wind-good: #3dd6b5;
-  --wind-mid: #7d919c;
-  --wind-bad: #ff7a6b;
+  /* Strong wind: the one exception to the Rating scale */
+  --strip: #0a0c0b;
+  --strong-wind: #ff8466;
   --label-w: 82px;
   --cell-h: 60px;
   --wind-h: 17px;
@@ -81,18 +80,8 @@ h1 {
 }
 
 .stale {
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: var(--warn-bg);
   color: var(--warn-ink);
   font-size: 13px;
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-}
-.stale svg {
-  flex: none;
-  margin-top: 1px;
 }
 .stale p {
   margin: 0;
@@ -122,7 +111,7 @@ h1 {
   box-shadow: inset 0 -2px 0 var(--ink);
 }
 .tab:focus-visible {
-  outline: 2px solid var(--good);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 .tab-label {
@@ -167,13 +156,6 @@ h1 {
   flex-direction: column;
   gap: 4px;
 }
-.tide-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  font-size: 11px;
-  color: var(--muted);
-}
 .plot {
   position: relative;
   height: var(--plot-h);
@@ -192,7 +174,7 @@ h1 {
 }
 .tide-line {
   fill: none;
-  stroke: var(--good);
+  stroke: var(--accent);
   stroke-width: 2;
   vector-effect: non-scaling-stroke;
 }
@@ -218,7 +200,7 @@ h1 {
   transform: translateX(-50%);
   font-size: 10px;
   font-weight: 600;
-  color: #c9d6dd;
+  color: var(--ink);
   white-space: nowrap;
   padding: 0 4px;
   border-radius: 3px;
@@ -236,12 +218,11 @@ h1 {
 
 /* Tide chart while a Spot is open: swell bars over a dashed tide line */
 .tide.open .tide-area,
-.tide.open .tide-event,
-.tide.open .tide-title {
+.tide.open .tide-event {
   display: none;
 }
 .tide.open .tide-line {
-  stroke: var(--wind-mid);
+  stroke: var(--muted);
   stroke-width: 1.5;
   stroke-dasharray: 4 3;
 }
@@ -268,15 +249,6 @@ h1 {
   font-weight: 700;
   color: var(--ink);
 }
-.bar-wind {
-  position: absolute;
-  top: calc(100% + 1px);
-  left: 0;
-  right: 0;
-  height: 5px;
-  border-radius: 1px;
-  background: var(--wind);
-}
 
 /* Grid */
 .grid {
@@ -298,12 +270,6 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  border-radius: 10px;
-}
-.spot-row.open {
-  /* A shadow, not padding, draws the band, so nothing moves when a row opens */
-  background: var(--panel-deep);
-  box-shadow: 0 0 0 6px var(--panel-deep);
 }
 .spot-name {
   display: flex;
@@ -330,7 +296,6 @@ h1 {
   font-size: 9px;
   font-weight: 700;
   color: var(--warn-ink);
-  text-transform: uppercase;
 }
 .old-data .old {
   display: block;
@@ -378,18 +343,26 @@ h1 {
     font-size: 9px;
   }
 }
-/* Wind gets a band of its own: with swell it decides if a Slot is surfable */
+/* The Rating already counts wind, so wind is plain text in the cell's ink */
 .cell-wind {
   align-self: stretch;
   height: var(--wind-h);
-  background: var(--wind);
-  color: var(--ground);
+  /* A hairline keeps wind apart from swell without a second colour */
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.18);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
+  opacity: 0.85;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 2px;
+}
+.cell.strong-wind .cell-wind {
+  background: var(--strip);
+  box-shadow: none;
+  color: var(--strong-wind);
+  font-weight: 700;
+  opacity: 1;
 }
 .cell.selected,
 .cell:focus-visible {
@@ -434,15 +407,6 @@ h1 {
   --fill: var(--great);
   --fill-ink: var(--great-ink);
 }
-.w-good {
-  --wind: var(--wind-good);
-}
-.w-mid {
-  --wind: var(--wind-mid);
-}
-.w-bad {
-  --wind: var(--wind-bad);
-}
 
 /* Details */
 .details {
@@ -461,9 +425,9 @@ h1 {
   flex: 1;
   height: 44px;
   border-radius: 10px;
-  border: 1px solid var(--wind-good);
-  background: color-mix(in srgb, var(--wind-good) 12%, transparent);
-  color: var(--wind-good);
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
   font-size: 14px;
   font-weight: 700;
   text-decoration: none;
@@ -496,10 +460,8 @@ h1 {
 }
 .slot-head {
   min-height: 0;
-  font-size: 10px;
+  font-size: 11px;
   color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
 }
 .slot-time,
 .slot-text {
@@ -541,12 +503,9 @@ h1 {
 .slot-text b span {
   font-weight: 500;
 }
-.slot-text.w-good b,
-.slot-text.w-bad b {
-  color: var(--wind);
-}
-.slot-text.w-mid b {
-  color: var(--muted);
+.slot-text .strong-wind {
+  color: var(--strong-wind);
+  font-weight: 700;
 }
 
 /* Legend */
@@ -569,11 +528,6 @@ h1 {
   height: 12px;
   border-radius: 2px;
   background: var(--fill);
-}
-.legend .ln {
-  width: 12px;
-  height: 4px;
-  background: var(--wind);
 }
 
 /* Side panel: wide screens only */
@@ -623,10 +577,10 @@ h1 {
     padding: 20px;
   }
   .grid {
-    gap: 10px;
+    gap: 6px;
   }
   .grid-row {
-    gap: 10px;
+    gap: 6px;
   }
   .cell b {
     font-size: 17px;
@@ -661,9 +615,8 @@ h1 {
   }
   .panel .legend-title {
     flex-basis: 100%;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    font-size: 11px;
+    color: var(--ink);
   }
   .panel .details {
     padding: 0;
