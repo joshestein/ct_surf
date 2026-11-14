@@ -443,7 +443,7 @@ h1 {
 .slots {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 .slot {
   display: grid;
@@ -451,8 +451,8 @@ h1 {
   grid-template-columns: 44px 34px 80px minmax(0, 1fr);
   gap: 6px;
   align-items: center;
-  min-height: 48px;
-  padding: 4px 6px;
+  min-height: 58px;
+  padding: 8px 6px;
   border-radius: 8px;
 }
 .slot.selected {
@@ -460,6 +460,7 @@ h1 {
 }
 .slot-head {
   min-height: 0;
+  padding-block: 0;
   font-size: 11px;
   color: var(--muted);
 }
