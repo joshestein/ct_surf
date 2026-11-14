@@ -128,7 +128,7 @@ ${style}</style>
 <div class="page">
 <header>
   <h1>Cape Town surf</h1>
-  <p class="updated">Updated ${updated.format(generatedAt)}.</p>
+  <p class="updated">Updated ${updated.format(generatedAt)}</p>
 </header>
 <div class="stale" role="status" hidden>${ICON_WARN}<div class="stale-text"></div></div>
 ${days.length ? `<nav class="tabs" aria-label="Days">${tabs}</nav>` : ""}
