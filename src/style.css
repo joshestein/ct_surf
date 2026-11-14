@@ -207,7 +207,7 @@ h1 {
   /* Keeps the label readable over the night shading and the tide line */
   background: var(--panel);
   /* Keep a label at the chart edge inside the chart */
-  left: clamp(32px, var(--x), calc(100% - 32px));
+  left: clamp(20px, var(--x), calc(100% - 20px));
 }
 .tide-high {
   top: 0;
