@@ -221,8 +221,12 @@ h1 {
   font-weight: 600;
   color: #c9d6dd;
   white-space: nowrap;
+  padding: 0 4px;
+  border-radius: 3px;
+  /* Keeps the label readable over the night shading and the tide line */
+  background: var(--panel);
   /* Keep a label at the chart edge inside the chart */
-  left: clamp(28px, var(--x), calc(100% - 28px));
+  left: clamp(32px, var(--x), calc(100% - 32px));
 }
 .tide-high {
   top: 0;
@@ -479,8 +483,9 @@ h1 {
 }
 .slot {
   display: grid;
-  grid-template-columns: 50px 34px minmax(0, 1fr) minmax(0, 1fr);
-  gap: 8px;
+  /* Swell is about 77px at 15px, so the rest goes to wind: "Cross-onshore" stays on one line */
+  grid-template-columns: 44px 34px 80px minmax(0, 1fr);
+  gap: 6px;
   align-items: center;
   min-height: 48px;
   padding: 4px 6px;
@@ -525,6 +530,13 @@ h1 {
 }
 .slot-text b {
   font-size: 15px;
+  white-space: nowrap;
+}
+/* About 112px is left for wind on a 360px phone */
+@media (max-width: 380px) {
+  .slot-text b {
+    font-size: 14px;
+  }
 }
 .slot-text b span {
   font-weight: 500;
@@ -658,6 +670,10 @@ h1 {
   }
   .panel .details {
     padding: 0;
+  }
+  .slot {
+    grid-template-columns: 50px 34px 92px minmax(0, 1fr);
+    gap: 8px;
   }
   .wide-only {
     display: inline;
