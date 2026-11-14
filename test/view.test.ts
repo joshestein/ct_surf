@@ -2,7 +2,7 @@ import { strict as assert } from "node:assert";
 import { describe, it } from "node:test";
 import { localIso, minutesInto } from "../src/time.ts";
 import type { ForecastDay, Tide } from "../src/types.ts";
-import { chartX, chooseSlots, compassDegrees, surfWindow, tideLevel, tone, windClass } from "../src/view.ts";
+import { chartX, chooseSlots, compassDegrees, isStrongWind, surfWindow, tideLevel, tone } from "../src/view.ts";
 import { hours, snapshot } from "./fixtures.ts";
 
 const { days } = snapshot;
@@ -27,18 +27,9 @@ describe("view", () => {
     ]);
   });
 
-  it("groups Wind States", () => {
-    assert.equal(windClass("glassy", 5), "good");
-    assert.equal(windClass("cross-offshore", 30), "good");
-    assert.equal(windClass("cross-shore", 15), "mid");
-    assert.equal(windClass("cross-onshore", 15), "bad");
-  });
-
-  it("counts light wind as good and strong cross-shore wind as bad", () => {
-    assert.equal(windClass("on-shore", 9), "good");
-    assert.equal(windClass("on-shore", 10), "bad");
-    assert.equal(windClass("cross-shore", 19), "mid");
-    assert.equal(windClass("cross-shore", 20), "bad");
+  it("flags strong wind from 30 km/h", () => {
+    assert.equal(isStrongWind(29), false);
+    assert.equal(isStrongWind(30), true);
   });
 
   it("turns compass points into degrees", () => {
