@@ -129,10 +129,10 @@ function apply() {
     });
     $(".tide", section).classList.toggle("open", !!open);
     $$(".bars", section).forEach((bars) => (bars.hidden = bars.dataset.spot !== open));
-    $$(".bar, .slot[data-time]", section).forEach((el) =>
-      el.classList.toggle("selected", el.dataset.time === state.time),
-    );
+    $$(".bar", section).forEach((el) => el.classList.toggle("selected", el.dataset.time === state.time));
   }
+  // Not by section: on a wide screen the open details block sits in the side panel
+  $$(".slot[data-time]").forEach((el) => el.classList.toggle("selected", el.dataset.time === state.time));
   // An open details block may sit in the side panel, outside its day section, so go by its home row
   for (const [details, row] of home) {
     const isOpen = details.dataset.spot === state.spot && row.closest(".day")?.getAttribute("data-day") === state.day;
@@ -164,6 +164,13 @@ document.addEventListener("click", (event) => {
     // Tapping the selected cell again closes the details
     state.spot = same ? null : spot;
     state.time = same ? null : (cell.dataset.time ?? null);
+    apply();
+    return;
+  }
+  // A swell bar or a details row picks that Slot of the open Spot
+  const pick = target?.closest(".bar, .slot[data-time]");
+  if (pick instanceof HTMLElement && state.spot && pick.dataset.time) {
+    state.time = pick.dataset.time;
     apply();
   }
 });
