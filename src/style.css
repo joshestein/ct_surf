@@ -462,8 +462,9 @@ h1 {
   flex: 1;
   height: 44px;
   border-radius: 10px;
-  background: var(--wind-good);
-  color: #06231d;
+  border: 1px solid var(--wind-good);
+  background: color-mix(in srgb, var(--wind-good) 12%, transparent);
+  color: var(--wind-good);
   font-size: 14px;
   font-weight: 700;
   text-decoration: none;
