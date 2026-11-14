@@ -233,10 +233,7 @@ function renderTide(day: ForecastDay, columns: Slot[], spots: Spot[], slots: (Sl
   const events = tides
     .map((t) => ({ ...t, m: minutesInto(day.date, t.time) }))
     .filter((t) => t.m >= CHART_FROM && t.m <= CHART_TO)
-    .map(
-      (t) =>
-        `<span class="tide-event tide-${t.type}" style="--x:${chartX(t.m)}%">${fromMinutes(t.m)}</span>`,
-    )
+    .map((t) => `<span class="tide-event tide-${t.type}" style="--x:${chartX(t.m)}%">${fromMinutes(t.m)}</span>`)
     .join("");
 
   const ticks = columns
