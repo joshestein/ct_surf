@@ -240,26 +240,19 @@ function renderTide(day: ForecastDay, columns: Slot[], spots: Spot[], slots: (Sl
   const dawn = Math.max(0, chartX(toMinutes(day.sunrise)) * 10);
   const dusk = Math.min(1000, chartX(toMinutes(day.sunset)) * 10);
 
-  const dayTides = tides
+  const events = tides
     .map((t) => ({ ...t, m: minutesInto(day.date, t.time) }))
-    .filter((t) => t.m >= 0 && t.m < 24 * 60);
-  const events = dayTides
     .filter((t) => t.m >= CHART_FROM && t.m <= CHART_TO)
     .map(
       (t) =>
         `<span class="tide-event tide-${t.type}" style="--x:${chartX(t.m)}%">${t.type === "high" ? "High" : "Low"} ${fromMinutes(t.m)}</span>`,
     )
     .join("");
-  const list = (type: Tide["type"]) =>
-    dayTides
-      .filter((t) => t.type === type)
-      .map((t) => fromMinutes(t.m))
-      .join(", ") || "none";
 
   const ticks = columns
     .map((s) => {
       const x = chartX(minutesInto(day.date, s.time));
-      return `<span class="tick" data-time="${s.time}" style="left:${x}%"></span><span class="tick-label" data-time="${s.time}" style="left:${x}%">${s.coarse ? slotLabel(s) : clock(s.time).slice(0, 2)}</span>`;
+      return `<span class="tick" data-time="${s.time}" style="left:${x}%"></span><span class="tick-label" data-time="${s.time}" style="left:${x}%">${slotLabel(s)}</span>`;
     })
     .join("");
 
@@ -290,6 +283,5 @@ function renderTide(day: ForecastDay, columns: Slot[], spots: Spot[], slots: (Sl
           ${ticks}${events}${bars}
         </div>
         <div class="axis"></div>
-        <p class="tide-times">High ${list("high")}. Low ${list("low")}.</p>
       </div>`;
 }
