@@ -230,12 +230,6 @@ h1 {
 .tide-low {
   bottom: 4px;
 }
-.tide-times {
-  margin: 0;
-  font-size: 11px;
-  color: var(--muted);
-  display: none;
-}
 
 /* Tide chart while a Spot is open: swell bars over a dashed tide line */
 .tide.open .tide-area,
@@ -247,9 +241,6 @@ h1 {
   stroke: var(--wind-mid);
   stroke-width: 1.5;
   stroke-dasharray: 4 3;
-}
-.tide.open .tide-times {
-  display: block;
 }
 .bar {
   position: absolute;
