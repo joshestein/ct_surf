@@ -5,15 +5,13 @@ import type { ClientConfig, ForecastDay, Slot, Snapshot, Spot, Tide } from "./ty
 import {
   CHART_FROM,
   CHART_TO,
-  LIGHT_WIND_KMH,
-  STRONG_WIND_KMH,
   WIND_LABEL,
   chartX,
   chooseSlots,
   compassDegrees,
+  isStrongWind,
   tideLevel,
   tone,
-  windClass,
 } from "./view.ts";
 
 // Inlined so the page stays one file that writeAtomic swaps in whole
@@ -47,11 +45,9 @@ const escape = (s: string) =>
   s.replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch] ?? ch);
 
 const noon = (date: string) => new Date(localIso(date, 12 * 60));
-const windClassOf = (s: Slot) => `w-${windClass(s.windState, s.wind.speed)}`;
 /** Column heading: "08:00", or "AM" / "PM" for coarse Slots */
 const slotLabel = (s: Slot) => (s.coarse ? (clock(s.time) < "12:00" ? "AM" : "PM") : clock(s.time));
 
-const ICON_WARN = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4"/><path d="M12 17.5v.5"/></svg>`;
 const ICON_CAM = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H3z"/><path d="m17 10 4-2.5v9L17 14"/></svg>`;
 
 const legend = `
@@ -62,12 +58,6 @@ const legend = `
       <span><i class="sw t-fair"></i>3 to 4</span>
       <span><i class="sw t-good"></i>5 to 6</span>
       <span><i class="sw t-great"></i>7+</span>
-    </div>
-    <div class="legend-group">
-      <span class="legend-title">Wind, km/h</span>
-      <span><i class="ln w-good"></i>offshore or under ${LIGHT_WIND_KMH}</span>
-      <span><i class="ln w-mid"></i>cross, under ${STRONG_WIND_KMH}</span>
-      <span><i class="ln w-bad"></i>onshore or strong cross</span>
     </div>
   </div>`;
 
@@ -116,7 +106,7 @@ export function render(spots: Spot[], snapshots: (Snapshot | null)[], generatedA
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#0B1720">
+<meta name="theme-color" content="#0F1211">
 <title>Cape Town surf</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -130,7 +120,7 @@ ${style}</style>
   <h1>Cape Town surf</h1>
   <p class="updated">Updated ${updated.format(generatedAt)}</p>
 </header>
-<div class="stale" role="status" hidden>${ICON_WARN}<div class="stale-text"></div></div>
+<div class="stale" role="status" hidden><div class="stale-text"></div></div>
 ${days.length ? `<nav class="tabs" aria-label="Days">${tabs}</nav>` : ""}
 <div class="layout">
   <main class="board">
@@ -197,7 +187,7 @@ function renderRow(spot: Spot, dayLabel: string, columns: Slot[], slots: Slot[] 
       const s = slots.find((x) => x.time === column.time);
       if (!s) return `<span class="cell cell-empty" data-time="${column.time}">–</span>`;
       const label = `${spot.name} ${slotLabel(s)}: rating ${s.rating}, swell ${s.swell.height} m ${s.swell.period} s, wind ${WIND_LABEL[s.windState].toLowerCase()} ${s.wind.speed} km/h. Show details.`;
-      return `<button type="button" class="cell t-${tone(s.rating)} ${windClassOf(s)}" data-time="${s.time}" data-r="${s.rating}" aria-expanded="false" aria-label="${escape(label)}"><span class="cell-main"><b>${s.rating}</b><span class="cell-swell">${s.swell.height.toFixed(1)}<small>m</small> ${s.swell.period}<small>s</small></span></span><span class="cell-wind">${windBadge(s.wind)}</span></button>`;
+      return `<button type="button" class="cell t-${tone(s.rating)}${isStrongWind(s.wind.speed) ? " strong-wind" : ""}" data-time="${s.time}" data-r="${s.rating}" aria-expanded="false" aria-label="${escape(label)}"><span class="cell-main"><b>${s.rating}</b><span class="cell-swell">${s.swell.height.toFixed(1)}<small>m</small> ${s.swell.period}<small>s</small></span></span><span class="cell-wind">${windBadge(s.wind)}</span></button>`;
     })
     .join("");
 
@@ -208,7 +198,7 @@ function renderRow(spot: Spot, dayLabel: string, columns: Slot[], slots: Slot[] 
               <span role="cell" class="slot-time"><b>${slotLabel(s)}</b>${s.coarse ? `<small>${clock(s.time)}</small>` : ""}</span>
               <span role="cell"><span class="slot-r t-${tone(s.rating)}">${s.rating}</span></span>
               <span role="cell" class="slot-text"><b>${s.swell.height.toFixed(1)} m <span>${s.swell.period} s</span></b><small>${s.swell.direction}, ${s.energy} kJ</small></span>
-              <span role="cell" class="slot-text ${windClassOf(s)}"><b>${WIND_LABEL[s.windState]}</b><small>${s.wind.speed} km/h ${s.wind.direction}</small></span>
+              <span role="cell" class="slot-text"><b>${WIND_LABEL[s.windState]}</b><small>${isStrongWind(s.wind.speed) ? `<span class="strong-wind">${s.wind.speed} km/h</span>` : `${s.wind.speed} km/h`} ${s.wind.direction}</small></span>
             </div>`,
     )
     .join("");
@@ -245,7 +235,7 @@ function renderTide(day: ForecastDay, columns: Slot[], spots: Spot[], slots: (Sl
     .filter((t) => t.m >= CHART_FROM && t.m <= CHART_TO)
     .map(
       (t) =>
-        `<span class="tide-event tide-${t.type}" style="--x:${chartX(t.m)}%">${t.type === "high" ? "High" : "Low"} ${fromMinutes(t.m)}</span>`,
+        `<span class="tide-event tide-${t.type}" style="--x:${chartX(t.m)}%">${fromMinutes(t.m)}</span>`,
     )
     .join("");
 
@@ -263,7 +253,7 @@ function renderTide(day: ForecastDay, columns: Slot[], spots: Spot[], slots: (Sl
       const items = spotSlots
         .map((s) => {
           const height = Math.max(4, Math.min(100, (s.swell.height / CHART_MAX_SWELL_M) * 75));
-          return `<span class="bar t-${tone(s.rating)}${s.coarse ? " bar-wide" : ""}" data-time="${s.time}" style="left:${chartX(minutesInto(day.date, s.time))}%;height:${height.toFixed(1)}%"><span class="bar-label">${s.swell.height.toFixed(1)}</span><span class="bar-wind ${windClassOf(s)}"></span></span>`;
+          return `<span class="bar t-${tone(s.rating)}${s.coarse ? " bar-wide" : ""}" data-time="${s.time}" style="left:${chartX(minutesInto(day.date, s.time))}%;height:${height.toFixed(1)}%"><span class="bar-label">${s.swell.height.toFixed(1)}</span></span>`;
         })
         .join("");
       return `<div class="bars" data-spot="${spot.id}" hidden>${items}</div>`;
@@ -272,7 +262,6 @@ function renderTide(day: ForecastDay, columns: Slot[], spots: Spot[], slots: (Sl
 
   return `
       <div class="tide">
-        <div class="tide-head"><span class="tide-title">Tide and daylight</span><span>Daylight ${day.sunrise} to ${day.sunset}</span></div>
         <div class="plot">
           <svg viewBox="0 0 1000 72" preserveAspectRatio="none" aria-hidden="true">
             <rect class="night" x="0" y="0" width="${dawn.toFixed(1)}" height="72"/>

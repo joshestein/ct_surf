@@ -2,23 +2,18 @@ import { minutesInto, toMinutes } from "./time.ts";
 import type { ForecastDay, Slot, Tide, WindState } from "./types.ts";
 
 type Tone = "poor" | "fair" | "good" | "great";
-type WindClass = "good" | "mid" | "bad";
 
 export function tone(rating: number): Tone {
   return rating >= 7 ? "great" : rating >= 5 ? "good" : rating >= 3 ? "fair" : "poor";
 }
 
-/** Below this, wind barely touches the surface, whatever its direction */
-export const LIGHT_WIND_KMH = 10;
-/** From this, cross-shore wind breaks up the surf as much as onshore wind */
-export const STRONG_WIND_KMH = 20;
+/**
+ * From this speed, wind from any direction is flagged. The Rating already counts wind,
+ * so the page shows no other wind colour.
+ */
+export const STRONG_WIND_KMH = 30;
 
-export function windClass(state: WindState, speed: number): WindClass {
-  if (speed < LIGHT_WIND_KMH) return "good";
-  if (state === "glassy" || state === "off-shore" || state === "cross-offshore") return "good";
-  if (state === "cross-shore") return speed < STRONG_WIND_KMH ? "mid" : "bad";
-  return "bad";
-}
+export const isStrongWind = (speed: number) => speed >= STRONG_WIND_KMH;
 
 const COMPASS = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
 
