@@ -1,0 +1,677 @@
+:root {
+  --ground: #0b1720;
+  --panel: #12222d;
+  --panel-deep: #0e1c25;
+  --night: #08121a;
+  --ink: #e8eff3;
+  --muted: #9fb2bd;
+  --rule: #20343f;
+  --tick: #2c4250;
+  --edge: #3a505c;
+  --picked: #1d3a4d;
+  --warn-bg: #3a2a12;
+  --warn-ink: #ffd9a0;
+  /* Rating groups: fill and text */
+  --poor: #3a505c;
+  --poor-ink: #e8eff3;
+  --fair: #2e6a99;
+  --fair-ink: #ffffff;
+  --good: #5aa9ec;
+  --good-ink: #0b1720;
+  --great: #ffb547;
+  --great-ink: #1a1206;
+  /* Wind State groups */
+  --wind-good: #3dd6b5;
+  --wind-mid: #7d919c;
+  --wind-bad: #ff7a6b;
+  --label-w: 82px;
+  --cell-h: 60px;
+  --wind-h: 17px;
+  --plot-h: 72px;
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font:
+    14px/1.4 Inter,
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+  -webkit-text-size-adjust: 100%;
+}
+button {
+  font: inherit;
+  color: inherit;
+}
+[hidden] {
+  display: none !important;
+}
+
+.page {
+  max-width: 1032px;
+  margin: 0 auto;
+  padding: calc(20px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 40px
+    max(16px, env(safe-area-inset-left));
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+h1 {
+  margin: 0;
+  font-family: "Space Grotesk", Inter, sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.updated {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.stale {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+  font-size: 13px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.stale svg {
+  flex: none;
+  margin-top: 1px;
+}
+.stale p {
+  margin: 0;
+}
+
+/* Day tabs */
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(var(--days, 7), minmax(0, 1fr));
+  gap: 3px;
+}
+.tab {
+  min-height: 50px;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.tab[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--ground);
+}
+.tab:focus-visible {
+  outline: 2px solid var(--good);
+  outline-offset: 2px;
+}
+.tab-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+}
+.tab-label b {
+  font-size: 13px;
+}
+.tab-label span {
+  font-size: 10px;
+  opacity: 0.85;
+}
+.mark {
+  width: 22px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--fill, var(--poor));
+}
+
+/* Board */
+.board {
+  background: var(--panel);
+  border-radius: 14px;
+  padding: 14px 12px;
+}
+.day {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.empty {
+  margin: 0;
+  color: var(--muted);
+}
+
+/* Tide chart */
+.tide {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tide-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 11px;
+  color: var(--muted);
+}
+.plot {
+  position: relative;
+  height: var(--plot-h);
+}
+.plot svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.night {
+  fill: var(--night);
+}
+.tide-area {
+  fill: #1f4560;
+}
+.tide-line {
+  fill: none;
+  stroke: var(--good);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--tick);
+}
+.tick-label {
+  position: absolute;
+  top: calc(100% + 8px);
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--muted);
+}
+.axis {
+  height: 22px;
+}
+.tide-event {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 10px;
+  font-weight: 600;
+  color: #c9d6dd;
+  white-space: nowrap;
+  /* Keep a label at the chart edge inside the chart */
+  left: clamp(28px, var(--x), calc(100% - 28px));
+}
+.tide-high {
+  top: 0;
+}
+.tide-low {
+  bottom: 4px;
+}
+.tide-times {
+  margin: 0;
+  font-size: 11px;
+  color: var(--muted);
+  display: none;
+}
+
+/* Tide chart while a Spot is open: swell bars over a dashed tide line */
+.tide.open .tide-area,
+.tide.open .tide-event,
+.tide.open .tide-title {
+  display: none;
+}
+.tide.open .tide-line {
+  stroke: var(--wind-mid);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+}
+.tide.open .tide-times {
+  display: block;
+}
+.bar {
+  position: absolute;
+  bottom: 0;
+  width: 18px;
+  transform: translateX(-50%);
+  border-radius: 3px 3px 0 0;
+  background: var(--fill);
+}
+.bar-wide {
+  width: 26px;
+}
+.bar.selected {
+  box-shadow: 0 0 0 2px var(--ink);
+}
+.bar-label {
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.bar-wind {
+  position: absolute;
+  top: calc(100% + 1px);
+  left: 0;
+  right: 0;
+  height: 5px;
+  border-radius: 1px;
+  background: var(--wind);
+}
+
+/* Grid */
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.grid-row {
+  display: grid;
+  grid-template-columns: var(--label-w) repeat(var(--n), minmax(0, 1fr));
+  gap: 3px;
+}
+.grid-head {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+}
+.spot-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-radius: 10px;
+}
+.spot-row.open {
+  /* A shadow, not padding, draws the band, so nothing moves when a row opens */
+  background: var(--panel-deep);
+  box-shadow: 0 0 0 6px var(--panel-deep);
+}
+.spot-name {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  line-height: 1.15;
+  min-width: 0;
+}
+.spot-name a {
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+@media (hover: hover) {
+  .spot-name a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+}
+.old {
+  display: none;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--warn-ink);
+  text-transform: uppercase;
+}
+.old-data .old {
+  display: block;
+}
+.cell {
+  position: relative;
+  height: var(--cell-h);
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--fill);
+  color: var(--fill-ink);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.cell-main {
+  flex: 1;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.cell b {
+  font-size: 15px;
+  line-height: 17px;
+}
+.cell-swell {
+  font-size: 10px;
+  line-height: 12px;
+  white-space: nowrap;
+  letter-spacing: -0.02em;
+}
+.cell-swell small {
+  font-size: 0.8em;
+  opacity: 0.85;
+}
+/* 5 columns leave about 42px a cell on a 360px phone */
+@media (max-width: 380px) {
+  .cell-swell {
+    font-size: 9px;
+  }
+}
+/* Wind gets a band of its own: with swell it decides if a Slot is surfable */
+.cell-wind {
+  align-self: stretch;
+  height: var(--wind-h);
+  background: var(--wind);
+  color: var(--ground);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.cell.selected,
+.cell:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+.cell-empty {
+  background: transparent;
+  border: 1px dashed var(--edge);
+  color: var(--muted);
+  cursor: default;
+}
+.old-data .cell,
+.old-data .slot {
+  opacity: 0.6;
+}
+.nodata {
+  grid-column: span var(--n);
+  height: var(--cell-h);
+  border: 1px dashed var(--edge);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.t-poor {
+  --fill: var(--poor);
+  --fill-ink: var(--poor-ink);
+}
+.t-fair {
+  --fill: var(--fair);
+  --fill-ink: var(--fair-ink);
+}
+.t-good {
+  --fill: var(--good);
+  --fill-ink: var(--good-ink);
+}
+.t-great {
+  --fill: var(--great);
+  --fill-ink: var(--great-ink);
+}
+.w-good {
+  --wind: var(--wind-good);
+}
+.w-mid {
+  --wind: var(--wind-mid);
+}
+.w-bad {
+  --wind: var(--wind-bad);
+}
+
+/* Details */
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 6px 2px 2px;
+}
+.details-actions {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 10px;
+}
+.webcam {
+  flex: 1;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--wind-good);
+  color: #06231d;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.webcam:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+.slots {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.slot {
+  display: grid;
+  grid-template-columns: 50px 34px minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-height: 48px;
+  padding: 4px 6px;
+  border-radius: 8px;
+}
+.slot.selected {
+  background: var(--picked);
+}
+.slot-head {
+  min-height: 0;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.slot-time,
+.slot-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+.slot-time b {
+  font-size: 14px;
+  font-weight: 600;
+}
+.slot-time small,
+.slot-text small {
+  font-size: 11px;
+  color: var(--muted);
+}
+.slot-r {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  background: var(--fill);
+  color: var(--fill-ink);
+}
+.slot-text b {
+  font-size: 15px;
+}
+.slot-text b span {
+  font-weight: 500;
+}
+.slot-text.w-good b,
+.slot-text.w-bad b {
+  color: var(--wind);
+}
+.slot-text.w-mid b {
+  color: var(--muted);
+}
+
+/* Legend */
+.legend,
+.legend-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  font-size: 11px;
+  color: var(--muted);
+  align-items: center;
+}
+.legend span {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+.legend .sw {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--fill);
+}
+.legend .ln {
+  width: 12px;
+  height: 4px;
+  background: var(--wind);
+}
+
+/* Side panel: wide screens only */
+.panel {
+  display: none;
+}
+.wide-only {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  :root {
+    --label-w: 128px;
+    --cell-h: 72px;
+    --wind-h: 20px;
+    --plot-h: 100px;
+  }
+  .page {
+    padding-top: calc(36px + env(safe-area-inset-top));
+  }
+  header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  h1 {
+    font-size: 30px;
+  }
+  .tabs {
+    gap: 6px;
+  }
+  .tab {
+    min-height: 60px;
+  }
+  .tab-label {
+    flex-direction: row;
+    gap: 4px;
+  }
+  .tab-label b,
+  .tab-label span {
+    font-size: 14px;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 20px;
+    align-items: start;
+  }
+  .board {
+    padding: 20px;
+  }
+  .grid {
+    gap: 10px;
+  }
+  .grid-row {
+    gap: 10px;
+  }
+  .cell b {
+    font-size: 17px;
+  }
+  .cell-swell {
+    font-size: 12px;
+  }
+  .cell-wind {
+    font-size: 12px;
+  }
+  .board .legend {
+    display: none;
+  }
+  .panel {
+    display: block;
+    background: var(--panel);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .panel-intro p {
+    margin: 0 0 18px;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+  .panel .legend {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .panel .legend-group {
+    font-size: 12px;
+  }
+  .panel .legend-title {
+    flex-basis: 100%;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .panel .details {
+    padding: 0;
+  }
+  .wide-only {
+    display: inline;
+  }
+  .narrow-only {
+    display: none;
+  }
+}
